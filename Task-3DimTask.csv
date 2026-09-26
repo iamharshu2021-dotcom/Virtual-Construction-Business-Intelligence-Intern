@@ -1,0 +1,11 @@
+TaskID,ProjectID,TaskName,WBSLevel,PredecessorTaskID,PlannedStartDate,PlannedEndDate,TaskStatus
+T001,P001,Site Clearance & Survey,1,,2026-01-05,2026-01-20,Completed
+T002,P001,Foundation Work,1,T001,2026-01-21,2026-03-10,Completed
+T003,P001,Structural Framing,1,T002,2026-03-11,2026-06-30,In Progress
+T004,P001,MEP Installation,1,T003,2026-07-01,2026-09-15,Not Started
+T005,P002,Excavation & Piling,1,,2026-02-10,2026-03-05,Completed
+T006,P002,Tower Superstructure,1,T005,2026-03-06,2026-09-30,In Progress
+T007,P003,Pier & Abutment Casting,1,,2026-03-01,2026-06-15,In Progress
+T008,P003,Girder Launching,1,T007,2026-06-16,2026-10-01,Not Started
+T009,P004,Steel Shed Erection,1,,2026-04-15,2026-07-01,In Progress
+T010,P004,Finishing & Handover,1,T009,2026-07-02,2026-10-10,Not Started

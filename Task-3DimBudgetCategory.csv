@@ -1,0 +1,6 @@
+CategoryID,CategoryName,CategoryGroup
+C001,Labor Cost,Direct Cost
+C002,Material Cost,Direct Cost
+C003,Equipment Cost,Direct Cost
+C004,Overhead,Indirect Cost
+C005,Contingency,Indirect Cost

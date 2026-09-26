@@ -1,0 +1,9 @@
+ResourceID,ResourceName,ResourceType,RoleOrCategory,UnitCostOrRate,Vendor
+R001,Site Labour Crew,Labor,Skilled Mason,650,In-house
+R002,Site Labour Crew - Unskilled,Labor,Helper,420,In-house
+R003,Tower Crane TC-140,Equipment,Lifting Equipment,18000,BuildRent Equipment Co.
+R004,Concrete Batching Plant,Equipment,Concrete Production,25000,BuildRent Equipment Co.
+R005,Ready Mix Concrete M25,Material,Concrete,5800,UltraTech Suppliers
+R006,TMT Steel Bars Fe500,Material,Reinforcement Steel,62000,Shree Steel Traders
+R007,Structural Steel Section,Material,Structural Steel,71000,Shree Steel Traders
+R008,Site Engineer,Labor,Supervisory Staff,1800,In-house

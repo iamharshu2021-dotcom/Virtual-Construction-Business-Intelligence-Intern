@@ -1,0 +1,173 @@
+// ============================================================================
+// DAX MEASURES — Virtual Construction Business Data Model
+// Author: Harsh Mishra
+// Model: FactCost, FactResourceAllocation, FactProjectProgress
+//        DimProject, DimTask, DimResource, DimBudgetCategory, DimDate
+// Paste each measure into Power BI: Modeling > New Measure
+// ============================================================================
+
+// ---------------------------------------------------------------------------
+// 1. BASE MEASURES (building blocks used by the KPIs below)
+// ---------------------------------------------------------------------------
+
+Total Budgeted Cost =
+SUM ( FactCost[BudgetedCost] )
+
+Total Actual Cost =
+SUM ( FactCost[ActualCost] )
+
+Total Committed Cost =
+SUM ( FactCost[CommittedCost] )
+
+Contract Value (BAC) =
+CALCULATE (
+    SUM ( DimProject[ContractValue] ),
+    CROSSFILTER ( FactCost[ProjectID], DimProject[ProjectID], BOTH )
+)
+
+// Planned Value: contract value earned according to the PLANNED % complete
+Planned Value (PV) =
+SUMX (
+    FactProjectProgress,
+    DIVIDE ( FactProjectProgress[PlannedPercentComplete], 100 )
+        * RELATED ( DimProject[ContractValue] )
+)
+
+// Earned Value: contract value earned according to the ACTUAL % complete
+Earned Value (EV) =
+SUMX (
+    FactProjectProgress,
+    DIVIDE ( FactProjectProgress[ActualPercentComplete], 100 )
+        * RELATED ( DimProject[ContractValue] )
+)
+
+// ---------------------------------------------------------------------------
+// 2. ADVANCED KPI #1 — Cost Variance % (Budget vs Actual, by any slice:
+//    project / task / resource / category / date)
+// ---------------------------------------------------------------------------
+
+Cost Variance % =
+VAR Budgeted = [Total Budgeted Cost]
+VAR Actual   = [Total Actual Cost]
+RETURN
+    DIVIDE ( Actual - Budgeted, Budgeted, BLANK () )
+
+Cost Variance % (Formatted) =
+VAR CV = [Cost Variance %]
+RETURN
+    IF ( CV > 0.10, "Over Budget: " & FORMAT ( CV, "0.0%" ),
+    IF ( CV < -0.10, "Under Budget: " & FORMAT ( CV, "0.0%" ),
+        "On Track: " & FORMAT ( CV, "0.0%" ) ) )
+
+// ---------------------------------------------------------------------------
+// 3. ADVANCED KPI #2 — Cumulative (Running-Total) Project Cost
+//    Uses ALLSELECTED so it still respects slicers on Project/Task/Resource
+//    while accumulating across the Date dimension only.
+// ---------------------------------------------------------------------------
+
+Cumulative Actual Cost =
+CALCULATE (
+    [Total Actual Cost],
+    FILTER (
+        ALLSELECTED ( DimDate[Date] ),
+        DimDate[Date] <= MAX ( DimDate[Date] )
+    )
+)
+
+Cumulative Budgeted Cost =
+CALCULATE (
+    [Total Budgeted Cost],
+    FILTER (
+        ALLSELECTED ( DimDate[Date] ),
+        DimDate[Date] <= MAX ( DimDate[Date] )
+    )
+)
+
+Cumulative Cost Variance =
+[Cumulative Actual Cost] - [Cumulative Budgeted Cost]
+
+// ---------------------------------------------------------------------------
+// 4. ADVANCED KPI #3 — Earned Value Management (EVM) Performance Indices
+//    Industry-standard construction KPIs for cost & schedule health.
+// ---------------------------------------------------------------------------
+
+Cost Performance Index (CPI) =
+DIVIDE ( [Earned Value (EV)], [Total Actual Cost], BLANK () )
+
+Schedule Performance Index (SPI) =
+DIVIDE ( [Earned Value (EV)], [Planned Value (PV)], BLANK () )
+
+Cost Variance (CV - EVM) =
+[Earned Value (EV)] - [Total Actual Cost]
+
+Schedule Variance (SV - EVM) =
+[Earned Value (EV)] - [Planned Value (PV)]
+
+// ---------------------------------------------------------------------------
+// 5. ADVANCED KPI #4 — Predictive Project Completion (Forecasting)
+//    Estimate at Completion (cost forecast) and a schedule-based
+//    forecasted completion date, both driven by current performance trend.
+// ---------------------------------------------------------------------------
+
+Estimate at Completion (EAC) =
+VAR BAC = [Contract Value (BAC)]
+VAR CPI = [Cost Performance Index (CPI)]
+RETURN
+    IF ( CPI = 0 || ISBLANK ( CPI ), BAC, DIVIDE ( BAC, CPI, BAC ) )
+
+Estimate to Complete (ETC) =
+[Estimate at Completion (EAC)] - [Total Actual Cost]
+
+Variance at Completion (VAC) =
+[Contract Value (BAC)] - [Estimate at Completion (EAC)]
+
+Forecasted Completion Date =
+VAR StartDate = CALCULATE ( MIN ( DimProject[StartDate] ) )
+VAR PlannedEnd = CALCULATE ( MAX ( DimProject[PlannedEndDate] ) )
+VAR PlannedDurationDays = DATEDIFF ( StartDate, PlannedEnd, DAY )
+VAR SPI = [Schedule Performance Index (SPI)]
+VAR AdjustedDurationDays =
+    IF ( SPI = 0 || ISBLANK ( SPI ), PlannedDurationDays,
+        DIVIDE ( PlannedDurationDays, SPI, PlannedDurationDays ) )
+RETURN
+    StartDate + AdjustedDurationDays
+
+// ---------------------------------------------------------------------------
+// 6. ADVANCED KPI #5 — Resource Utilization Rate
+//    Compares actual labor/equipment hours consumed vs. planned hours.
+// ---------------------------------------------------------------------------
+
+Total Planned Hours =
+SUM ( FactResourceAllocation[PlannedHours] )
+
+Total Actual Hours =
+SUM ( FactResourceAllocation[ActualHours] )
+
+Resource Utilization Rate =
+DIVIDE ( [Total Actual Hours], [Total Planned Hours], BLANK () )
+
+Resource Overallocation Flag =
+IF ( [Resource Utilization Rate] > 1.15, "Overallocated",
+IF ( [Resource Utilization Rate] < 0.85, "Underutilized", "Balanced" ) )
+
+// ---------------------------------------------------------------------------
+// 7. ADVANCED KPI #6 — Time Intelligence: Month-over-Month Cost Growth
+//    Demonstrates DAX time-intelligence functions over DimDate.
+// ---------------------------------------------------------------------------
+
+Actual Cost - Prior Month =
+CALCULATE (
+    [Total Actual Cost],
+    DATEADD ( DimDate[Date], -1, MONTH )
+)
+
+MoM Cost Growth % =
+DIVIDE (
+    [Total Actual Cost] - [Actual Cost - Prior Month],
+    [Actual Cost - Prior Month],
+    BLANK ()
+)
+
+// ============================================================================
+// END OF FILE
+// ============================================================================

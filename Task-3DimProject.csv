@@ -1,0 +1,5 @@
+ProjectID,ProjectName,ProjectType,Location,ClientName,ProjectManager,StartDate,PlannedEndDate,ContractValue
+P001,Riverside Business Park,Commercial,Lucknow,Omega Realty Pvt Ltd,Ankit Verma,2026-01-05,2026-11-30,45000000
+P002,Greenview Residency Tower,Residential,Kanpur,Greenview Developers,Ritu Sharma,2026-02-10,2027-01-15,68000000
+P003,NH-27 Flyover Extension,Infrastructure,Lucknow,UP State PWD,Sanjay Rathi,2026-03-01,2026-12-20,120000000
+P004,Sunrise Industrial Shed,Industrial,Unnao,Sunrise Textiles Ltd,Priya Nair,2026-04-15,2026-10-10,31000000
