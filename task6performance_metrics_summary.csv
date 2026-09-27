@@ -1,0 +1,12 @@
+Model,Metric,Actual Value,Target,Status
+Overrun Flag,Accuracy,0.6103448275862069,0.7,Below Target
+Overrun Flag,Precision,0.4968944099378882,0.65,Below Target
+Overrun Flag,Recall,0.7142857142857143,0.65,Met
+Overrun Flag,F1 Score,0.5860805860805861,0.7,Below Target
+Overrun Flag,AUC-ROC,0.5733346709470305,0.75,Below Target
+Schedule Delay Flag,Accuracy,0.8241379310344827,0.7,Met
+Schedule Delay Flag,Precision,1.0,0.65,Met
+Schedule Delay Flag,Recall,0.4631578947368421,0.65,Below Target
+Schedule Delay Flag,F1 Score,0.6330935251798561,0.7,Below Target
+Overrun % (Gradient Boosting),MAE,0.28470132649892904,,N/A
+Overrun % (Gradient Boosting),R2,0.9987055594329786,,N/A
